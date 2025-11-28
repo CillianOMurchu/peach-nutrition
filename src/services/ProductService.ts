@@ -1,3 +1,4 @@
+import { AppDataSource } from "../config/data-source.js";
 import { Product } from "../entities/Product.js";
 import { ProductRepository } from "../respositories/ProductRepository.js";
 
@@ -78,6 +79,35 @@ export const ProductService = {
     const deleteResult = await ProductRepository.delete(id);
 
     // Check if the deletion was successful (TypeORM returns a result object)
-    return deleteResult.affected !== undefined && deleteResult.affected !== null && deleteResult.affected > 0;
+    return (
+      deleteResult.affected !== undefined &&
+      deleteResult.affected !== null &&
+      deleteResult.affected > 0
+    );
+  },
+
+  /**
+   * Creates multiple new product entities in a single batch operation.
+   * @param data - An array of raw product data objects.
+   * @returns A promise resolving to an array of the newly created Product entities.
+   */
+  createBulkProducts: async (data: Partial<Product>[]): Promise<Product[]> => {
+    // You could wrap this in a transaction here for ACID compliance,
+    // but for simplicity, we rely on TypeORM's batch save.
+
+    // Example: Validate all items before attempting to save
+    for (const item of data) {
+      if (!item.name || item.price === undefined) {
+        throw new Error(
+          "Bulk upload failed: Missing name or price in one item."
+        );
+      }
+    }
+
+    // Create an array of product entities and delegate saving to the Repository
+    const productEntities = data.map((item) =>
+      AppDataSource.getRepository(Product).create(item)
+    );
+    return AppDataSource.getRepository(Product).save(productEntities);
   },
 };

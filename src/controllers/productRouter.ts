@@ -1,5 +1,6 @@
 import { Router, Request, Response } from "express";
 import { ProductService } from "../services/ProductService.js";
+import { Product } from "../entities/Product.js";
 
 // Router handles all product-related API endpoints
 export const productRouter = Router();
@@ -93,7 +94,7 @@ productRouter.delete("/:id", async (req: Request, res: Response) => {
         .json({ message: "Product ID is required in the URL." });
     }
     const id = parseInt(idParam); // Extract ID from URL path parameters
-    
+
     if (isNaN(id)) {
       return res.status(400).json({ message: "Invalid product ID format." });
     }
@@ -113,6 +114,36 @@ productRouter.delete("/:id", async (req: Request, res: Response) => {
     console.error("Error deleting product:", error);
     return res.status(500).json({
       message: "Internal Server Error during product deletion.",
+    });
+  }
+});
+
+/**
+ * @route POST /api/v1/products/bulk
+ * @desc Creates multiple products from a single JSON array payload.
+ * @access Private
+ */
+productRouter.post("/bulk", async (req: Request, res: Response) => {
+  try {
+    const data: Partial<Product>[] = req.body;
+
+    if (!Array.isArray(data) || data.length === 0) {
+      return res
+        .status(400)
+        .json({ message: "Payload must be a non-empty array." });
+    }
+
+    const newProducts = await ProductService.createBulkProducts(data);
+
+    // RESTful best practice: 201 Created
+    return res.status(201).json(newProducts);
+  } catch (error) {
+    console.error("Error creating bulk products:", error);
+    return res.status(400).json({
+      message:
+        error instanceof Error
+          ? error.message
+          : "Bulk import failed due to invalid data.",
     });
   }
 });

@@ -37,4 +37,27 @@ export const ProductService = {
     // Delegate saving to the Repository
     return ProductRepository.create(data);
   },
+
+  /**
+   * Updates an existing product with the given data.
+   * @param id - ID of the product to update.
+   * @param data - The partial data to apply.
+   * @returns The updated Product entity, or null if not found.
+   */
+  updateProduct: async (
+    id: number,
+    data: Partial<Product>
+  ): Promise<Product | null> => {
+    const product = await ProductRepository.findById(id);
+
+    if (!product) {
+      return null; // Product not found
+    }
+
+    // Apply partial updates to the existing entity
+    Object.assign(product, data);
+
+    // Delegate saving to the Repository
+    return ProductRepository.save(product);
+  },
 };

@@ -33,4 +33,19 @@ export const ProductRepository = {
         return repository.save(newProduct);
     },
 
+    /**
+     * Finds a single product by its ID.
+     */
+    findById: async (id: number): Promise<Product | null> => {
+        return repository.findOne({ where: { id } });
+    },
+
+    /**
+     * Saves the provided product entity (handles both insert and update).
+     * @param product - The product entity with updated fields.
+     */
+    save: async (product: Product): Promise<Product> => {
+        return repository.save(product);
+    }
+
 };

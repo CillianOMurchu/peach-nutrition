@@ -42,3 +42,37 @@ productRouter.post("/", async (req: Request, res: Response) => {
     });
   }
 });
+
+/**
+ * @route PATCH /api/v1/products/:id
+ * @desc Updates one or more fields of a specific product.
+ * @access Private (Requires Auth/Admin Role)
+ */
+productRouter.patch("/:id", async (req: Request, res: Response) => {
+  try {
+    const idParam = req.params.id;
+    if (typeof idParam !== "string") {
+      return res.status(400).json({ message: "Product ID is required in the URL." });
+    }
+    const id = parseInt(idParam); // Extract ID from URL path parameters
+    const data = req.body; // Partial data for update
+
+    if (isNaN(id)) {
+      return res.status(400).json({ message: "Invalid product ID format." });
+    }
+
+    const updatedProduct = await ProductService.updateProduct(id, data);
+
+    if (!updatedProduct) {
+      return res.status(404).json({ message: "Product not found." }); // RESTful best practice: 404
+    }
+
+    // RESTful best practice: 200 OK and return the updated resource
+    return res.status(200).json(updatedProduct);
+  } catch (error) {
+    console.error("Error updating product:", error);
+    return res.status(500).json({
+      message: "Internal Server Error during product update.",
+    });
+  }
+});

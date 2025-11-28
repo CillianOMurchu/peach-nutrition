@@ -38,6 +38,8 @@
     "target": "ES2022", // Use a modern target for compatibility
     "verbatimModuleSyntax": false,
     "rootDir": "./src",
-    "outDir": "./dist"
+    "outDir": "./dist",
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true
   }
 }

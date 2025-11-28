@@ -1,6 +1,7 @@
 // src/config/data-source.ts
 import "reflect-metadata";
 import { DataSource } from "typeorm";
+import { Product } from "../entities/Product.js";
 
 // This is the main configuration object for TypeORM
 export const AppDataSource = new DataSource({
@@ -12,7 +13,7 @@ export const AppDataSource = new DataSource({
   database: "peach_nutrition_db", // The database created in Step 6
   synchronize: true, // WARNING: Only for development! Creates/updates tables automatically
   logging: false,
-  entities: [], // Will hold our models (e.g., User, Product) soon
+  entities: [Product], // Will hold our models (e.g., User, Product) soon
   migrations: [],
   subscribers: [],
 });

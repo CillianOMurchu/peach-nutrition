@@ -7,8 +7,6 @@
 
     // Environment Settings
     // See also https://aka.ms/tsconfig/module
-    "module": "nodenext",
-    "target": "esnext",
     "types": [],
     // For nodejs:
     // "lib": ["esnext"],
@@ -35,10 +33,13 @@
     // Recommended Options
     "strict": true,
     "jsx": "react-jsx",
-    "verbatimModuleSyntax": true,
     "isolatedModules": true,
     "noUncheckedSideEffectImports": true,
     "moduleDetection": "force",
     "skipLibCheck": true,
+    "module": "NodeNext", // Use 'NodeNext' for modern Node.js module resolution
+    "moduleResolution": "NodeNext", // Helps TypeScript understand how Node.js resolves modules
+    "target": "ES2022", // Use a modern target for compatibility
+    "verbatimModuleSyntax": false
   }
 }

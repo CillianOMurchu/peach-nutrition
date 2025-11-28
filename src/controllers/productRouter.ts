@@ -52,7 +52,9 @@ productRouter.patch("/:id", async (req: Request, res: Response) => {
   try {
     const idParam = req.params.id;
     if (typeof idParam !== "string") {
-      return res.status(400).json({ message: "Product ID is required in the URL." });
+      return res
+        .status(400)
+        .json({ message: "Product ID is required in the URL." });
     }
     const id = parseInt(idParam); // Extract ID from URL path parameters
     const data = req.body; // Partial data for update
@@ -73,6 +75,44 @@ productRouter.patch("/:id", async (req: Request, res: Response) => {
     console.error("Error updating product:", error);
     return res.status(500).json({
       message: "Internal Server Error during product update.",
+    });
+  }
+});
+
+/**
+ * @route DELETE /api/v1/products/:id
+ * @desc Deletes a product from the inventory.
+ * @access Private (Requires Auth/Admin Role)
+ */
+productRouter.delete("/:id", async (req: Request, res: Response) => {
+  try {
+    const idParam = req.params.id;
+    if (typeof idParam !== "string") {
+      return res
+        .status(400)
+        .json({ message: "Product ID is required in the URL." });
+    }
+    const id = parseInt(idParam); // Extract ID from URL path parameters
+    
+    if (isNaN(id)) {
+      return res.status(400).json({ message: "Invalid product ID format." });
+    }
+
+    const success = await ProductService.deleteProduct(id);
+
+    if (!success) {
+      return res
+        .status(404)
+        .json({ message: "Product not found or already deleted." });
+    }
+
+    // RESTful best practice: HTTP 204 No Content for successful deletion
+    // (no response body is returned).
+    return res.status(204).send();
+  } catch (error) {
+    console.error("Error deleting product:", error);
+    return res.status(500).json({
+      message: "Internal Server Error during product deletion.",
     });
   }
 });

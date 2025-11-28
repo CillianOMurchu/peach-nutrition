@@ -46,6 +46,16 @@ export const ProductRepository = {
      */
     save: async (product: Product): Promise<Product> => {
         return repository.save(product);
-    }
+    },
+
+    /**
+     * Deletes a product by its ID.
+     * @param id - ID of the product to delete.
+     * @returns The result of the deletion operation.
+     */
+    delete: async (id: number) => {
+        // TypeORM's delete method returns the deletion result.
+        return repository.delete(id);
+    },
 
 };

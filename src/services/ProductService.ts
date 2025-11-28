@@ -60,4 +60,24 @@ export const ProductService = {
     // Delegate saving to the Repository
     return ProductRepository.save(product);
   },
+
+  /**
+   * Attempts to delete a product by ID.
+   * @param id - ID of the product to delete.
+   * @returns true if deletion was successful (one or more rows affected), false otherwise.
+   */
+  deleteProduct: async (id: number): Promise<boolean> => {
+    // Find the product first to implement a cleaner 404 response in the Controller
+    const product = await ProductRepository.findById(id);
+
+    if (!product) {
+      return false; // Product does not exist
+    }
+
+    // Delegate deletion to the Repository
+    const deleteResult = await ProductRepository.delete(id);
+
+    // Check if the deletion was successful (TypeORM returns a result object)
+    return deleteResult.affected !== undefined && deleteResult.affected !== null && deleteResult.affected > 0;
+  },
 };

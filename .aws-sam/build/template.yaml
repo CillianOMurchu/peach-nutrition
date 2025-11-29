@@ -1,0 +1,46 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Peach Nutrition Serverless Components for Asynchronous Tasks
+Globals:
+  Function:
+    Timeout: 10
+    MemorySize: 256
+    Runtime: nodejs20.x
+Resources:
+  OrderProcessingQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: pn-order-queue
+  OrderProcessorFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      CodeUri: OrderProcessorFunction
+      Policies:
+      - SQSReadWritePolicy:
+          QueueName:
+            Fn::GetAtt:
+            - OrderProcessingQueue
+            - QueueName
+      Events:
+        SQSEvent:
+          Type: SQS
+          Properties:
+            Queue:
+              Fn::GetAtt:
+              - OrderProcessingQueue
+              - Arn
+            BatchSize: 10
+    Metadata:
+      SamResourceId: OrderProcessorFunction
+Outputs:
+  OrderProcessingQueueURL:
+    Description: URL of the SQS Queue for the Order Processor
+    Value:
+      Ref: OrderProcessingQueue
+  OrderProcessorFunctionArn:
+    Description: ARN of the Order Processor Lambda Function
+    Value:
+      Fn::GetAtt:
+      - OrderProcessorFunction
+      - Arn

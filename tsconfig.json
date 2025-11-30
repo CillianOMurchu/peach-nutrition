@@ -37,9 +37,13 @@
     "moduleResolution": "NodeNext", // Helps TypeScript understand how Node.js resolves modules
     "target": "ES2022", // Use a modern target for compatibility
     "verbatimModuleSyntax": false,
-    "rootDir": "./src",
+    "rootDir": ".", // Set rootDir to project root to include all source files
     "outDir": "./dist",
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true
-  }
+  },
+  "include": [
+    "src",
+    "worker-src"
+  ]
 }

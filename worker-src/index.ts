@@ -8,11 +8,14 @@ const RECIPIENT_EMAIL = "cillian.murchu@gmail.com";
 const sesClient = new SESClient({ region: REGION });
 
 function createEmailBody(order: any) {
-  let body = `New Order Received - ID: ${order.userId}\n\n`;
+    let body = `New Order Received - ID: ${order.userId}\n\n`;
   body += `Order Date: ${order.orderDate}\n\n`;
   body += "Items:\n";
   order.items.forEach((item: any) => {
-    body += ` - Product ID: ${item.productId}, Quantity: ${item.quantity}\n`;
+    const details = Object.entries(item)
+      .map(([key, value]) => `${key}: ${value}`)
+      .join(", ");
+    body += ` - ${details}\n`;
   });
   body += "\n--- End of Order ---";
   return body;

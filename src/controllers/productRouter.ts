@@ -2,7 +2,6 @@ import { Router, Request, Response } from "express";
 import { ProductService } from "../services/ProductService.js";
 import { Product } from "../entities/Product.js";
 
-// Router handles all product-related API endpoints
 export const productRouter = Router();
 
 /**

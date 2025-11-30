@@ -1,6 +1,12 @@
 import { AppDataSource } from "../config/data-source.js";
 import { Product } from "../entities/Product.js";
 import { ProductRepository } from "../respositories/ProductRepository.js";
+import { SQSClient, SendMessageCommand } from "@aws-sdk/client-sqs";
+
+const SQS = new SQSClient({ region: "eu-north-1" });
+
+const ORDER_QUEUE_URL =
+  "https://sqs.eu-north-1.amazonaws.com/938177530055/OrderProcessingQueue";
 
 /**
  * Business Logic Layer (Service) for Products.
@@ -109,5 +115,43 @@ export const ProductService = {
       AppDataSource.getRepository(Product).create(item)
     );
     return AppDataSource.getRepository(Product).save(productEntities);
+  },
+
+  /**
+   * Delegates the order processing task by sending the order payload to the SQS queue.
+   * @param orderPayload The order data to queue.
+   */
+  queueOrder: async (orderPayload: any): Promise<void> => {
+    if (!ORDER_QUEUE_URL) {
+      console.error("SQS Queue URL is not set. Cannot queue order.");
+      throw new Error("Service Misconfiguration: SQS Queue URL is missing.");
+    }
+
+    console.log(`Sending order message to SQS Queue: ${ORDER_QUEUE_URL}`);
+
+    const command = new SendMessageCommand({
+      QueueUrl: ORDER_QUEUE_URL,
+      MessageBody: JSON.stringify(orderPayload),
+    });
+
+    try {
+      const response = await SQS.send(command);
+      console.log("Order successfully queued. Message ID:", response.MessageId);
+    } catch (error) {
+      console.error("Failed to queue order:", error);
+      // Re-throw the error to be handled by the controller
+      throw new Error("Failed to queue order message.");
+    }
+  },
+
+  /**
+   * Placeholder for a synchronous check before queueing the order.
+   * @param items - Array of items in the order.
+   * @returns Always true for now, until actual logic is implemented.
+   */
+  checkInventory: (items: any[]): boolean => {
+    // 💡 Placeholder for real inventory logic (e.g., checking stock levels in the database)
+    console.log(`Simulating quick inventory check for ${items.length} items.`);
+    return true;
   },
 };

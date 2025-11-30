@@ -1,41 +1,46 @@
+
 # 🍑 Peach Nutrition API
+A Node.js TypeScript REST API for managing the Peach Nutrition e-commerce platform's products and asynchronous order processing.
 
-This project is for the Peach Nutrition e-commerce platform. 
+## 🚀 Technologies
+- Node.js (ES Modules)
+- TypeScript
+- PostgreSQL (Docker-managed)
+- TypeORM ORM
+- Express.js
+- Layered architecture (Controller-Service-Repository)
 
-## 🚀 Key Technologies
+## 🏗️ Architecture Overview
+- **Controller:** Handles HTTP requests and responses
+- **Service:** Contains business logic
+- **Repository:** Manages database access with TypeORM
 
-* **Platform:** Node.js (with ES Modules)
-* **Language:** **TypeScript**
-* **Database:** PostgreSQL (managed via Docker)
-* **ORM (Object-Relational Mapper):** **TypeORM**
-* **Web Framework:** Express.js
-* **Architecture:** **Layered (Controller, Service, Repository)**
+## 📋 API Endpoints (Full CRUD under `/api/v1`)
 
-## 🏗️ Implemented Architecture & Data Flow
+| Resource  | Method | Path                | Description                       |
+|-----------|--------|---------------------|-----------------------------------|
+| Products  | GET    | /products           | List all products                 |
+| Products  | POST   | /products           | Create a product                  |
+| Products  | POST   | /products/bulk      | Bulk create (for Shopify CSV import) |
+| Products  | PATCH  | /products/:id       | Update a product partially        |
+| Products  | DELETE | /products/:id       | Delete a product                  |
+| Orders    | POST   | /orders             | Queue a new order for asynchronous processing (202 Accepted) |
 
-The system features a **three-tier architecture** that ensures **clean code** and **separation of concerns**:
+## ☁️ Asynchronous Order Processing
+Orders are handled asynchronously using AWS SAM, SQS, and Lambda:
 
-1.  **Controller Layer:** Handles HTTP requests and response formatting (`src/controllers/productRouter.ts`).
-2.  **Service Layer:** Contains all **Business Logic** and orchestrates complex operations (`src/services/ProductService.ts`).
-3.  **Repository Layer:** Manages all data access via TypeORM to PostgreSQL (`src/repositories/ProductRepository.ts`).
-
-## 📋 Completed Endpoints (Full CRUD)
-
-All endpoints are versioned at `/api/v1/`.
-
-| Resource | Method | Path | Description | HTTP Status |
-| :--- | :--- | :--- | :--- | :--- |
-| **Products** | `GET` | `/products` | **Read:** Retrieves all available products. | `200 OK` |
-| **Products** | `POST` | `/products` | **Create:** Creates a single new product. | `201 Created` |
-| **Products** | `POST` | `/products/bulk` | **Create (Bulk):** Accepts a JSON array for mass data migration (used for Shopify import). | `201 Created` |
-| **Products** | `PATCH` | `/products/:id` | **Update:** Partially updates product fields (e.g., price, stock). | `200 OK` |
-| **Products** | `DELETE` | `/products/:id` | **Delete:** Removes a specific product from the catalog. | `204 No Content` |
+1. Client posts order (**202 ACCEPTED**)
+2. API enqueues order message to SQS
+3. Lambda triggered by SQS processes the order
 
 ## 🛠️ Getting Started
-
-1.  **Dependencies:** `npm install`
-2.  **Database:** Start the PostgreSQL container: `docker compose up -d`
-3.  **Run Dev Server:** `npm run dev`
-
----
-**Current State:** The entire product catalog has been successfully imported from the Shopify CSV using the `/api/v1/products/bulk` endpoint. The project is ready for the integration of **Cloud (AWS)** and **Asynchronous/Event-Driven** components.
+1. Clone the repo
+2. Install dependencies: `npm install`
+3. Start PostgreSQL with Docker:
+	```sh
+	docker compose up -d
+	```
+4. Run the API server (development mode):
+	```sh
+	npm run dev
+	```

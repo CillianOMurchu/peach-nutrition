@@ -28,6 +28,7 @@ Resources:
             - OrderProcessingQueue
             - QueueName
       - AWSLambdaBasicExecutionRole
+      - arn:aws:iam::aws:policy/AmazonSESFullAccess
       Events:
         OrderProcessor:
           Type: SQS

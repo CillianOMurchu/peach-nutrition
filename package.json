@@ -7,7 +7,8 @@
   "scripts": {
     "dev": "nodemon --exec \"node --loader ts-node/esm src/server.ts\"",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "sam-build": "npx tsc worker-src/index.ts --outDir build-order-processor/ && sam build --use-container",
+    "build:worker": "npx tsc worker-src/index.ts --outDir build-order-processor/ --module commonjs --esModuleInterop --target es2020",
+    "sam-build": "npm run build:worker && sam build --use-container",
     "sam-deploy": "sam deploy --stack-name PeachNutritionStack --s3-bucket peach-nutrition-deployment --capabilities CAPABILITY_IAM --region eu-north-1",
     "aws-delete-stack": "aws cloudformation delete-stack --stack-name PeachNutritionStack --region eu-north-1",
     "aws-await-stack-deletion": "aws cloudformation wait stack-delete-complete --stack-name PeachNutritionStack --region eu-north-1"
@@ -16,6 +17,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@aws-sdk/client-ses": "^3.940.0",
     "@aws-sdk/client-sqs": "^3.940.0",
     "express": "^5.1.0",
     "pg": "^8.16.3",
